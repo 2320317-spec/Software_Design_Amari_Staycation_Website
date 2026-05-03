@@ -1,0 +1,113 @@
+/* 1. THE LUXURY PALETTE */
+:root {
+    --mahogany: #502515;  /* Primary Identity */
+    --coffee: #564328;    /* Professional Text */
+    --gold: #c2a66e;      /* Buttons & Highlights */
+    --cream: #faf6f6;     /* Subtle Accents */
+    --white: #ffffff;
+    --shadow-tint: rgba(80, 37, 21, 0.1); /* Warm shadow */
+}
+
+/* 2. GENERAL STYLES */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--coffee);
+    margin: 0;
+    background-color: var(--white); /* Mostly white for a clean vibe */
+}
+
+header {
+    background: var(--mahogany);
+    color: var(--white);
+    padding: 3rem 1rem;
+    text-align: center;
+    border-bottom: 5px solid var(--gold); /* The "Gold Ribbon" */
+}
+
+header h1 {
+    margin: 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 2.2rem;
+}
+
+/* 3. UNIT CONTAINER LOGIC (Your original structure) */
+.unit-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 30px;
+}
+
+/* 4. UNIT CARD DESIGN (Upgraded Aesthetics) */
+.unit-card {
+    background: var(--white);
+    border-radius: 12px;
+    /* Using the mahogany-tinted shadow for warmth */
+    box-shadow: 0 8px 24px var(--shadow-tint); 
+    width: 320px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--cream);
+}
+
+.unit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(80, 37, 21, 0.15);
+}
+
+.unit-card h2 {
+    color: var(--mahogany);
+    margin-top: 0;
+    font-size: 1.4rem;
+}
+
+/* 5. BUTTONS (The "Gold" Standard) */
+.btn {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--white);
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-top: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn:hover {
+    background: var(--mahogany);
+    color: var(--white);
+}
+
+/* 6. TABLE STYLES (For Admin Dashboard) */
+.card {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px var(--shadow-tint);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    background-color: var(--cream);
+    color: var(--mahogany);
+    padding: 15px;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid var(--cream);
+}

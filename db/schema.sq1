@@ -1,0 +1,38 @@
+-- 1. Create the Database
+CREATE DATABASE IF NOT EXISTS amari_db;
+USE amari_db;
+
+-- 2. Units Table (To manage your 3 units) 
+CREATE TABLE IF NOT EXISTS units (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    price_per_night DECIMAL(10, 2) NOT NULL,
+    reservation_fee DECIMAL(10, 2) DEFAULT 0.00, -- 
+    amenities TEXT,
+    image_path VARCHAR(255),
+    status ENUM('available', 'maintenance') DEFAULT 'available'
+);
+
+-- 3. Bookings Table (To store guest requests) [cite: 202]
+CREATE TABLE IF NOT EXISTS bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    unit_id INT,
+    guest_title VARCHAR(50), -- 
+    guest_name VARCHAR(255) NOT NULL, -- 
+    guest_email VARCHAR(255) NOT NULL, -- 
+    check_in DATE NOT NULL,
+    check_out DATE NOT NULL,
+    total_price DECIMAL(10, 2),
+    status ENUM('pending', 'approved', 'declined') DEFAULT 'pending', -- 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (unit_id) REFERENCES units(id)
+);
+
+-- 4. Admin Table (For secure host login) [cite: 143, 279]
+CREATE TABLE IF NOT EXISTS admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL, -- Encrypted credentials [cite: 143, 279]
+    role ENUM('admin', 'staff') DEFAULT 'admin' -- [cite: 145, 285]
+);
