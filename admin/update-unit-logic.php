@@ -3,19 +3,27 @@ include('auth.php');
 include('../includes/db-config.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id = $_POST['unit_id'];
+    // Collect the data from the form
+    $id = $_POST['id'];
     $title = $_POST['title'];
     $price = $_POST['price'];
+    $amenities = $_POST['amenities'];
+    $status = $_POST['status'];
     $desc = $_POST['description'];
 
-    // SQL UPDATE Logic [cite: 170]
-    $stmt = $conn->prepare("UPDATE units SET title = ?, price_per_night = ?, description = ? WHERE id = ?");
-    $stmt->bind_param("sdsi", $title, $price, $desc, $id);
+    // SQL Engineering: Update the record matching the ID
+    $stmt = $conn->prepare("UPDATE units SET title=?, price_per_night=?, amenities=?, status=?, description=? WHERE id=?");
+    $stmt->bind_param("sdsssi", $title, $price, $amenities, $status, $desc, $id);
 
     if ($stmt->execute()) {
-        header("Location: manage-units.php?status=updated");
+        // Redirect back to inventory with a success flag
+        header("Location: manage-units.php?msg=success");
+        exit();
     } else {
-        echo "Error: " . $conn->error;
+        echo "Hardware/Database Error: " . $conn->error;
     }
+} else {
+    header("Location: manage-units.php");
+    exit();
 }
 ?>

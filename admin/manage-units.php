@@ -1,57 +1,197 @@
 <?php
-// 1. Security & Plumbing
 include('auth.php');
 include('../includes/db-config.php');
 
-// 2. Logic: Fetch the 3 units allowed by the SRS
-$sql = "SELECT * FROM units LIMIT 3";
-$result = $conn->query($sql);
+// Fetch all units - Calibrated to use 'title' for sorting
+$result = $conn->query("SELECT * FROM units ORDER BY title ASC");
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Units - Amari Host</title>
+    <title>Unit Inventory - Amari Alabang</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        .unit-edit-box { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; border-left: 5px solid #2c3e50; }
-        label { font-weight: bold; display: block; margin-top: 10px; }
-        input, textarea { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; }
+        /* The Grid Logic */
+        .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        /* The Card Architecture */
+        .unit-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px var(--shadow-tint);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(80, 37, 21, 0.05);
+        }
+
+        .unit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(80, 37, 21, 0.2);
+        }
+
+        /* Image Display Logic */
+        .unit-image-container {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background-color: #f8f1e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .unit-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-image {
+            color: var(--coffee);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.5;
+        }
+
+        .unit-details {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .unit-name {
+            color: var(--mahogany);
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .unit-price {
+            color: var(--gold);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .unit-amenities {
+            font-size: 0.75rem;
+            color: var(--mahogany);
+            background: rgba(194, 166, 110, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .unit-desc {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 10;
+        }
+
+        .status-available { background: #48bb78; color: white; }
+        .status-maintenance { background: #f56565; color: white; }
+        .status-booked { background: var(--gold); color: white; }
+
+        .card-actions {
+            border-top: 1px solid #f0f0f0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            background: #fafafa;
+        }
+
+        .btn-edit {
+            color: var(--mahogany);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .btn-edit:hover { color: var(--gold); }
     </style>
 </head>
 <body>
-    <header>
-        <nav><a href="dashboard.php" style="color:white;">← Back to Dashboard</a></nav>
-        <h1>Property Management</h1>
-        <p>Update pricing and details for your Alabang units</p>
-    </header>
 
-    <main style="padding: 20px; max-width: 800px; margin: auto;">
+<header>
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>Luxury Collection</h1>
+            <p>Manage your premium staycation inventory</p>
+        </div>
+        <a href="dashboard.php" class="btn" style="background: var(--gold);">Back to Dashboard</a>
+    </div>
+</header>
+
+<main class="container">
+    <div style="margin-top: 30px;">
+        <a href="add-unit.php" class="btn" style="background: var(--mahogany);">+ Add New Property</a>
+    </div>
+
+    <div class="unit-grid">
         <?php while($row = $result->fetch_assoc()): ?>
-            <div class="unit-edit-box">
-                <form action="update-unit-logic.php" method="POST">
-                    <input type="hidden" name="unit_id" value="<?php echo $row['id']; ?>">
+            <div class="unit-card">
+                <div class="status-badge status-<?php echo strtolower($row['status']); ?>">
+                    <?php echo $row['status']; ?>
+                </div>
+
+                <div class="unit-image-container">
+                    <?php if(!empty($row['image_path'])): ?>
+                        <img src="../images/<?php echo $row['image_path']; ?>" alt="<?php echo $row['title']; ?>">
+                    <?php else: ?>
+                        <div class="no-image">No Image Preview</div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="unit-details">
+                    <div class="unit-name"><?php echo $row['title']; ?></div>
+                    <div class="unit-price">₱<?php echo number_format($row['price_per_night'], 2); ?> <small style="font-size: 0.7rem; color: #999;">/ night</small></div>
                     
-                    <h3>Unit: <?php echo $row['title']; ?></h3>
-                    
-                    <label>Display Title:</label>
-                    <input type="text" name="title" value="<?php echo $row['title']; ?>" required>
+                    <?php if(!empty($row['amenities'])): ?>
+                        <div class="unit-amenities">
+                            📍 <?php echo $row['amenities']; ?>
+                        </div>
+                    <?php endif; ?>
 
-                    <label>Price per Night (₱):</label>
-                    <input type="number" name="price" value="<?php echo $row['price_per_night']; ?>" step="0.01" required>
+                    <p class="unit-desc">
+                        <?php echo substr($row['description'], 0, 100) . '...'; ?>
+                    </p>
+                </div>
 
-                    <label>Description:</label>
-                    <textarea name="description" rows="3"><?php echo $row['description']; ?></textarea>
-
-                    <button type="submit" class="btn" style="margin-top:15px; border:none; cursor:pointer;">Update Unit Details</button>
-                </form>
+                <div class="card-actions">
+                    <a href="edit-unit.php?id=<?php echo $row['id']; ?>" class="btn-edit">Edit Details</a>
+                    <a href="delete-unit.php?id=<?php echo $row['id']; ?>" class="btn-edit" style="color: #ccc;">Archive</a>
+                </div>
             </div>
         <?php endwhile; ?>
-    </main>
+    </div>
+</main>
+
 </body>
 </html>
-
-<nav>
-    <a href="dashboard.php">← Back to Reservations</a>
-</nav>
