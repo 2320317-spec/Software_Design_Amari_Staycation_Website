@@ -33,12 +33,76 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
         .btn-book-nav { background-color: var(--amari-tan); color: white; padding: 12px 25px; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s; }
         .btn-book-nav:hover { background-color: var(--amari-navy); }
 
-        /* Hero Carousel */
-        .hero { position: relative; height: 80vh; background: url('images/hero1.jpg') center/cover; background-color: #ddd; display: flex; align-items: center; justify-content: center; transition: background 0.5s ease-in-out; }
-        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 1; }
-        .hero-text { position: relative; z-index: 2; color: white; font-size: 4rem; letter-spacing: 5px; text-transform: uppercase; text-shadow: 2px 2px 15px rgba(0,0,0,0.5); }
-        .hero-arrows { position: absolute; z-index: 3; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; box-sizing: border-box; color: white; font-size: 4rem; font-weight: 300; }
-        .hero-arrows span { cursor: pointer; user-select: none; transition: 0.3s; opacity: 0.7; }
+        /* --- HERO CAROUSEL --- */
+        .hero { 
+            position: relative; 
+            height: 80vh; 
+            overflow: hidden; 
+            background: #000; 
+        }
+
+        /* The Lighting System: Slower, softer flash */
+        .flash-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            opacity: 0; 
+            z-index: 15;
+            pointer-events: none; 
+            /* UPGRADE: Slowed the flash transition down from 0.2s to 0.5s */
+            transition: opacity 0.5s ease-out; 
+        }
+
+        /* UPGRADE: Lowered the opacity so the flash is more subtle */
+        .flash-overlay.is-flashing {
+            opacity: 0.08; 
+        }
+        
+        .slider-track {
+            display: flex;
+            width: 300%; 
+            height: 100%;
+            /* UPGRADE: Slowed the slide from 0.8s to 1.4s, using a buttery ease-in-out curve */
+            transition: transform 1.4s ease-in-out; 
+        }
+
+        .slide { width: 33.333%; height: 100%; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
+
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10; display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.3); pointer-events: none; 
+        }
+
+        .hero-text { 
+            color: white; 
+            font-size: 4rem; 
+            letter-spacing: 5px; 
+            text-transform: uppercase; 
+            text-shadow: 2px 2px 15px rgba(0,0,0,0.5); 
+        }
+
+        /* The Typography Engine: Slower float */
+        .animate-title {
+            /* UPGRADE: Increased duration from 0.6s to 1.2s for a gentler float */
+            animation: textPopUp 1.2s ease-out forwards;
+        }
+
+        @keyframes textPopUp {
+            /* UPGRADE: Pushed the starting position lower (60px) so it travels further, slower */
+            0% { opacity: 0; transform: translateY(60px); } 
+            100% { opacity: 1; transform: translateY(0); }  
+        }
+        
+        .hero-arrows { 
+            position: absolute; width: 100%; display: flex; justify-content: space-between; 
+            padding: 0 50px; box-sizing: border-box; pointer-events: auto; 
+        }
+        .hero-arrows span { cursor: pointer; user-select: none; transition: 0.3s; opacity: 0.7; color: white; font-size: 4rem; font-weight: 300; }
         .hero-arrows span:hover { opacity: 1; transform: scale(1.1); color: var(--amari-tan); }
 
         /* Welcome Section */
@@ -52,7 +116,7 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
         .split-text h2 { font-size: 2.2rem; margin-bottom: 20px; }
         .find-out-link { color: white; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; margin-bottom: 15px; text-decoration: none; font-weight: bold; display: inline-block; transition: 0.3s; }
         .find-out-link:hover { color: var(--amari-navy); }
-        .split-image { flex: 1; min-width: 300px; min-height: 400px; background: url('images/split-bg.jpg') center/cover; background-color: #ccc; }
+        .split-image { flex: 1; min-width: 300px; min-height: 400px; background: url('assets/images/pool.jpg') center/cover; background-color: #ccc; }
 
         /* Dynamic Rooms */
         .rooms-section { padding: 80px 5%; background: var(--bg-light); text-align: center; }
@@ -76,28 +140,10 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
         .footer-col a:hover { color: white; text-decoration: underline; }
 
         /* --- CONTINUOUS SCROLL ANIMATIONS --- */
-        .fade-slide-up {
-            opacity: 0;
-            transform: translateY(60px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-
-        .fade-slide-left {
-            opacity: 0;
-            transform: translateX(-60px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-
-        .fade-slide-right {
-            opacity: 0;
-            transform: translateX(60px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-
-        .is-visible {
-            opacity: 1;
-            transform: translate(0);
-        }
+        .fade-slide-up { opacity: 0; transform: translateY(60px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .fade-slide-left { opacity: 0; transform: translateX(-60px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .fade-slide-right { opacity: 0; transform: translateX(60px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .is-visible { opacity: 1; transform: translate(0); }
     </style>
 </head>
 <body>
@@ -116,12 +162,22 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
     <a href="#rooms" class="btn-book-nav">Book Now</a>
 </nav>
 
-<header class="hero" id="heroSlider">
-    <div class="hero-arrows">
-        <span onclick="prevSlide()">&lsaquo;</span>
-        <span onclick="nextSlide()">&rsaquo;</span>
+<header class="hero">
+    <div class="flash-overlay" id="flashOverlay"></div>
+
+    <div class="slider-track" id="sliderTrack">
+        <div class="slide"><img src="assets/images/amari/hero1.jpg" alt="Amari"></div>
+        <div class="slide"><img src="assets/images/mariah/hero1.jpg" alt="Mariah"></div>
+        <div class="slide"><img src="assets/images/ara/hero1.jpg" alt="Ara"></div>
     </div>
-    <h1 class="hero-text" id="heroTitle">Daybeds</h1>
+
+    <div class="hero-overlay">
+        <div class="hero-arrows">
+            <span onclick="prevSlide()">&lsaquo;</span>
+            <span onclick="nextSlide()">&rsaquo;</span>
+        </div>
+        <h1 class="hero-text animate-title" id="heroTitle">Amari</h1>
+    </div>
 </header>
 
 <section class="welcome-section fade-slide-up">
@@ -147,7 +203,7 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
         <?php while($unit = $featured_query->fetch_assoc()): ?>
             <div class="room-card fade-slide-up">
                 <?php if(!empty($unit['image_path'])): ?>
-                    <img src="images/<?php echo $unit['image_path']; ?>" alt="Room Image">
+                    <img src="assets/images/<?php echo $unit['image_path']; ?>" alt="Room Image">
                 <?php else: ?>
                     <div style="height: 250px; background: #eee; display:flex; align-items:center; justify-content:center;">NO IMAGE</div>
                 <?php endif; ?>
@@ -211,28 +267,38 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
 </footer>
 
 <script>
-    const slides = [
-        { title: "Daybeds", image: "images/hero1.jpg" },
-        { title: "The Grand Suite", image: "images/hero2.jpg" },
-        { title: "Infinity Pool", image: "images/hero3.jpg" }
-    ];
-
+    // === UPGRADED SLIDER LOGIC ===
+    const titles = ["Amari", "Mariah", "Ara"];
     let currentSlide = 0;
-    const heroSlider = document.getElementById('heroSlider');
+    
+    const sliderTrack = document.getElementById('sliderTrack');
     const heroTitle = document.getElementById('heroTitle');
+    const flashOverlay = document.getElementById('flashOverlay');
 
     function updateCarousel() {
-        heroSlider.style.backgroundImage = `url('${slides[currentSlide].image}')`;
-        heroTitle.innerText = slides[currentSlide].title;
+        const offset = currentSlide * 33.3333;
+        sliderTrack.style.transform = `translateX(-${offset}%)`;
+        
+        flashOverlay.classList.add('is-flashing');
+        setTimeout(() => {
+            // UPGRADE: Extended the timeout from 200ms to 400ms so the flash matches the slower pace
+            flashOverlay.classList.remove('is-flashing'); 
+        }, 400);
+
+        heroTitle.classList.remove('animate-title');
+        void heroTitle.offsetWidth; 
+        
+        heroTitle.innerText = titles[currentSlide];
+        heroTitle.classList.add('animate-title'); 
     }
 
     function nextSlide() {
-        currentSlide = (currentSlide + 1) % slides.length;
+        currentSlide = (currentSlide + 1) % titles.length;
         updateCarousel();
     }
 
     function prevSlide() {
-        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        currentSlide = (currentSlide - 1 + titles.length) % titles.length;
         updateCarousel();
     }
 </script>
@@ -242,23 +308,19 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
     const observerOptions = {
         root: null,
         rootMargin: '0px',
-        threshold: 0.15 // Triggers when 15% of the element is visible
+        threshold: 0.15 
     };
 
     const scrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // When you scroll down to it, add the class to animate in
                 entry.target.classList.add('is-visible');
             } else {
-                // CRITICAL CHANGE: When you scroll past it, remove the class!
-                // This resets the element so it will animate again when you scroll back.
                 entry.target.classList.remove('is-visible');
             }
         });
     }, observerOptions);
 
-    // Attach the sensor to every animated element on the page
     const elementsToAnimate = document.querySelectorAll('.fade-slide-left, .fade-slide-right, .fade-slide-up');
     elementsToAnimate.forEach(el => {
         scrollObserver.observe(el);
