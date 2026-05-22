@@ -1,3 +1,4 @@
+
 <?php
 // Connect to the database to fetch the featured units
 include('includes/db-config.php');
@@ -33,10 +34,12 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
         .btn-book-nav { background-color: var(--amari-tan); color: white; padding: 12px 25px; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s; }
         .btn-book-nav:hover { background-color: var(--amari-navy); }
 
-        /* --- HERO CAROUSEL --- */
+        /* --- HERO CAROUSEL (FIXED FOR ZOOM CONSISTENCY) --- */
         .hero { 
             position: relative; 
             height: 80vh; 
+            min-height: 600px; /* FIXED: Prevents collapse on zoom out */
+            max-height: 1000px; /* FIXED: Prevents stretching on ultra-wide zoom */
             overflow: hidden; 
             background: #000; 
         }
@@ -52,11 +55,9 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
             opacity: 0; 
             z-index: 15;
             pointer-events: none; 
-            /* UPGRADE: Slowed the flash transition down from 0.2s to 0.5s */
             transition: opacity 0.5s ease-out; 
         }
 
-        /* UPGRADE: Lowered the opacity so the flash is more subtle */
         .flash-overlay.is-flashing {
             opacity: 0.08; 
         }
@@ -65,12 +66,21 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
             display: flex;
             width: 300%; 
             height: 100%;
-            /* UPGRADE: Slowed the slide from 0.8s to 1.4s, using a buttery ease-in-out curve */
+            will-change: transform; /* FIXED: Optimizes GPU for resizing/zooming */
             transition: transform 1.4s ease-in-out; 
         }
 
-        .slide { width: 33.333%; height: 100%; }
-        .slide img { width: 100%; height: 100%; object-fit: cover; }
+        .slide { 
+            width: 33.333%; 
+            height: 100%; 
+            flex-shrink: 0; /* FIXED: Prevents slide width warping on zoom */
+        }
+        .slide img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            object-position: center; /* FIXED: Keeps focus centered during zoom crops */
+        }
 
         .hero-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -88,12 +98,10 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
 
         /* The Typography Engine: Slower float */
         .animate-title {
-            /* UPGRADE: Increased duration from 0.6s to 1.2s for a gentler float */
             animation: textPopUp 1.2s ease-out forwards;
         }
 
         @keyframes textPopUp {
-            /* UPGRADE: Pushed the starting position lower (60px) so it travels further, slower */
             0% { opacity: 0; transform: translateY(60px); } 
             100% { opacity: 1; transform: translateY(0); }  
         }
@@ -159,7 +167,7 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
         <a href="experience.php">Experience</a>
         <a href="gallery.php">Gallery</a>
     </div>
-    <a href="#rooms" class="btn-book-nav">Book Now</a>
+    <a href="booking.php" class="btn-book-nav">Book Now</a>
 </nav>
 
 <header class="hero">
@@ -267,7 +275,7 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
 </footer>
 
 <script>
-    // === UPGRADED SLIDER LOGIC ===
+    // === SLIDER LOGIC ===
     const titles = ["Amari", "Mariah", "Ara"];
     let currentSlide = 0;
     
@@ -281,7 +289,6 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
         
         flashOverlay.classList.add('is-flashing');
         setTimeout(() => {
-            // UPGRADE: Extended the timeout from 200ms to 400ms so the flash matches the slower pace
             flashOverlay.classList.remove('is-flashing'); 
         }, 400);
 
