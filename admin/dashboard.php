@@ -6,8 +6,13 @@ include('auth.php');
 include('../includes/db-config.php');
 
 // 3. Fetch all "Pending" bookings for review 
-$sql = "SELECT * FROM bookings WHERE status = 'pending' ORDER BY check_in ASC";
-$result = $conn->query($sql);
+$sqlPending = "SELECT * FROM bookings WHERE status = 'pending' ORDER BY check_in ASC";
+$resultPending = $conn->query($sqlPending);
+
+// 4. Fetch all "Approved" bookings (Current and Future)
+$today = date('Y-m-d');
+$sqlApproved = "SELECT * FROM bookings WHERE status = 'approved' AND check_out >= '$today' ORDER BY check_in ASC";
+$resultApproved = $conn->query($sqlApproved);
 ?>
 
 <!DOCTYPE html>
@@ -69,30 +74,31 @@ $result = $conn->query($sql);
         .stat-info p { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
 
         /* --- DATA TABLES --- */
-        .data-panel { background: var(--white); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        .panel-header { padding: 30px 40px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .data-panel { background: var(--white); box-shadow: 0 10px 30px rgba(0,0,0,0.02); margin-bottom: 40px; border-radius: 8px; overflow: hidden; }
+        .panel-header { padding: 30px 40px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fff; }
         .panel-header h2 { font-size: 1.5rem; color: var(--amari-navy); }
-        .badge { background: var(--amari-tan); color: white; padding: 6px 15px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .badge { background: var(--amari-tan); color: white; padding: 6px 15px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; }
 
         table { width: 100%; border-collapse: collapse; }
         th { background-color: var(--white); color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; padding: 20px 40px; border-bottom: 1px solid #eee; text-align: left; }
         td { padding: 25px 40px; border-bottom: 1px solid #f9f9f9; vertical-align: middle; transition: 0.3s; }
         tr:hover td { background-color: #fafafa; }
         
-        .status-pill { background: rgba(176, 136, 90, 0.1); color: var(--amari-tan); padding: 6px 15px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(176, 136, 90, 0.3); }
+        .status-pill { padding: 6px 15px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; display: inline-block; }
+        .pill-pending { background: rgba(176, 136, 90, 0.1); color: var(--amari-tan); border: 1px solid rgba(176, 136, 90, 0.3); }
         
-        .btn-action { padding: 10px 18px; color: white; text-decoration: none; font-size: 0.75rem; font-weight: bold; margin-right: 8px; transition: 0.4s; display: inline-block; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-action { padding: 10px 18px; color: white; text-decoration: none; font-size: 0.75rem; font-weight: bold; margin-right: 8px; transition: 0.4s; display: inline-block; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; }
         .btn-approve { background-color: var(--amari-navy); border: 1px solid var(--amari-navy); }
         .btn-approve:hover { background-color: var(--amari-tan); border-color: var(--amari-tan); }
         .btn-decline { background-color: transparent; border: 1px solid #ccc; color: #888; }
         .btn-decline:hover { border-color: #d9534f; color: #d9534f; }
 
         /* Empty State */
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0; color: var(--text-muted); }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 0; color: var(--text-muted); }
         .empty-state i { font-size: 3.5rem; color: #eee; margin-bottom: 25px; }
         .empty-state p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; }
 
-        /* --- CONTINUOUS SCROLL ANIMATIONS (From Index.php) --- */
+        /* --- ANIMATIONS --- */
         .fade-slide-up { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
         .animate-title { animation: textPopUp 1.2s ease-out forwards; }
         @keyframes textPopUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -136,7 +142,7 @@ $result = $conn->query($sql);
                 <div class="stat-card fade-slide-up" style="transition-delay: 0.1s;">
                     <div class="stat-icon"><i class="fa-solid fa-bell"></i></div>
                     <div class="stat-info">
-                        <h3><?php echo $result->num_rows; ?></h3>
+                        <h3><?php echo $resultPending->num_rows; ?></h3>
                         <p>Pending Requests</p>
                     </div>
                 </div>
@@ -144,16 +150,15 @@ $result = $conn->query($sql);
                 <div class="stat-card fade-slide-up" style="transition-delay: 0.2s;">
                     <div class="stat-icon"><i class="fa-solid fa-key"></i></div>
                     <div class="stat-info">
-                        <h3>3</h3>
-                        <p>Active Units</p>
+                        <h3>3</h3> <p>Active Units</p>
                     </div>
                 </div>
                 
                 <div class="stat-card fade-slide-up" style="transition-delay: 0.3s;">
                     <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
                     <div class="stat-info">
-                        <h3>12</h3>
-                        <p>Upcoming Stays</p>
+                        <h3><?php echo $resultApproved->num_rows; ?></h3>
+                        <p>Confirmed Stays</p>
                     </div>
                 </div>
             </div>
@@ -161,11 +166,11 @@ $result = $conn->query($sql);
             <div class="data-panel fade-slide-up" style="transition-delay: 0.4s;">
                 <div class="panel-header">
                     <h2>Action Required</h2>
-                    <span class="badge"><?php echo $result->num_rows; ?> waiting</span>
+                    <span class="badge"><?php echo $resultPending->num_rows; ?> waiting</span>
                 </div>
                 
                 <div>
-                    <?php if ($result->num_rows > 0): ?>
+                    <?php if ($resultPending->num_rows > 0): ?>
                         <table>
                             <thead>
                                 <tr>
@@ -176,11 +181,11 @@ $result = $conn->query($sql);
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while($row = $result->fetch_assoc()): ?>
+                                <?php while($row = $resultPending->fetch_assoc()): ?>
                                     <tr>
                                         <td>
                                             <span style="font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--amari-navy); display: block; margin-bottom: 5px;">
-                                                <?php echo htmlspecialchars($row['guest_title'] . " " . $row['guest_name']); ?>
+                                                <?php echo htmlspecialchars($row['guest_name']); ?>
                                             </span>
                                             <small style="color: #999; letter-spacing: 1px; font-size: 0.75rem;"><i class="fa-regular fa-envelope"></i> <?php echo htmlspecialchars($row['guest_email']); ?></small>
                                         </td>
@@ -189,10 +194,9 @@ $result = $conn->query($sql);
                                                 <?php echo date("M d", strtotime($row['check_in'])); ?> <i class="fa-solid fa-arrow-right" style="font-size: 0.7rem; color: var(--amari-tan); margin: 0 8px;"></i> 
                                                 <?php echo date("M d", strtotime($row['check_out'])); ?>
                                             </span>
-                                            <small style="display: block; color: #aaa; font-weight: bold; font-size: 0.65rem; margin-top: 8px; letter-spacing: 2px;">2026 SEASON</small>
                                         </td>
                                         <td>
-                                            <span class="status-pill"><i class="fa-solid fa-hourglass-half"></i> Pending</span>
+                                            <span class="status-pill pill-pending"><i class="fa-solid fa-hourglass-half"></i> Pending</span>
                                         </td>
                                         <td>
                                             <a href="update-status.php?id=<?php echo $row['id']; ?>&action=approve" class="btn-action btn-approve"><i class="fa-solid fa-check"></i> Approve</a>
@@ -206,6 +210,74 @@ $result = $conn->query($sql);
                         <div class="empty-state">
                             <i class="fa-solid fa-mug-hot"></i>
                             <p>No pending requests. You're all caught up!</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="data-panel fade-slide-up" style="transition-delay: 0.5s;">
+                <div class="panel-header">
+                    <h2>Confirmed Reservations</h2>
+                    <span class="badge" style="background: var(--amari-navy);"><?php echo $resultApproved->num_rows; ?> active</span>
+                </div>
+                
+                <div>
+                    <?php if ($resultApproved->num_rows > 0): ?>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Guest Details</th>
+                                    <th>Contact</th>
+                                    <th>Stay Dates</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while($row = $resultApproved->fetch_assoc()): ?>
+                                    <?php 
+                                        // Check if the guest is currently in the unit
+                                        $checkInDate = $row['check_in'];
+                                        $checkOutDate = $row['check_out'];
+                                        $isCurrentlyHere = ($checkInDate <= $today && $checkOutDate >= $today);
+                                    ?>
+                                    <tr>
+                                        <td>
+                                            <span style="font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--amari-navy); display: block; margin-bottom: 5px;">
+                                                <?php echo htmlspecialchars($row['guest_name']); ?>
+                                            </span>
+                                            <small style="color: var(--amari-tan); font-weight: bold; letter-spacing: 1px; font-size: 0.7rem; text-transform: uppercase;">
+                                                UNIT ID: <?php echo htmlspecialchars($row['unit_id']); ?>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div style="color: #666; font-size: 0.85rem; margin-bottom: 3px;"><i class="fa-solid fa-phone" style="width: 15px; color: #ccc;"></i> <?php echo htmlspecialchars($row['phone']); ?></div>
+                                            <div style="color: #666; font-size: 0.85rem;"><i class="fa-regular fa-envelope" style="width: 15px; color: #ccc;"></i> <?php echo htmlspecialchars($row['guest_email']); ?></div>
+                                        </td>
+                                        <td>
+                                            <span style="font-weight: 700; color: #444; font-size: 0.9rem;">
+                                                <?php echo date("M d", strtotime($row['check_in'])); ?> <i class="fa-solid fa-arrow-right" style="font-size: 0.7rem; color: var(--amari-tan); margin: 0 8px;"></i> 
+                                                <?php echo date("M d", strtotime($row['check_out'])); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <?php if($isCurrentlyHere): ?>
+                                                <span class="status-pill" style="background: rgba(39, 174, 96, 0.1); color: #27ae60; border: 1px solid rgba(39, 174, 96, 0.3);">
+                                                    <i class="fa-solid fa-door-open"></i> In Residence
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="status-pill" style="background: rgba(4, 46, 71, 0.1); color: var(--amari-navy); border: 1px solid rgba(4, 46, 71, 0.2);">
+                                                    <i class="fa-solid fa-calendar-check"></i> Upcoming
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <div class="empty-state">
+                            <i class="fa-regular fa-calendar-xmark"></i>
+                            <p>No upcoming reservations currently scheduled.</p>
                         </div>
                     <?php endif; ?>
                 </div>
