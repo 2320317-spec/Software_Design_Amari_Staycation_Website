@@ -167,7 +167,7 @@ $featured_query = $conn->query("SELECT * FROM units WHERE status = 'available' O
         <a href="experience.php">Experience</a>
         <a href="gallery.php">Gallery</a>
     </div>
-    <a href="booking.php" class="btn-book-nav">Book Now</a>
+    <a href="#rooms" style="background-color: #b0885a; color: white; padding: 12px 25px; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; display: inline-block;">BOOK NOW</a>
 </nav>
 
 <header class="hero">
