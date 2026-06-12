@@ -1,6 +1,11 @@
 # Database Setup — Amari Staycation
 
-This folder contains the full database export (`amari_db.sql`) needed to run the site.
+This folder contains the database exports needed to run the site:
+
+| File | Use it for |
+|------|-----------|
+| `amari_db.sql` | **Local / XAMPP** — self-contained, includes `CREATE DATABASE amari_db`. One-click import. |
+| `amari_db_hostinger.sql` | **Hostinger / shared hosting** — table-only, imports into the prefixed DB you create in hPanel. See `../DEPLOY.md`. |
 
 ## How to import (choose one)
 

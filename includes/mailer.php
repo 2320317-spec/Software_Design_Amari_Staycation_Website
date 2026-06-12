@@ -8,6 +8,16 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 function sendAmariEmail($toEmail, $guestName, $subject, $htmlBody) {
+    // Load mail credentials from includes/secrets.php (gitignored, not in repo)
+    $secrets_file = __DIR__ . '/secrets.php';
+    $secrets = file_exists($secrets_file) ? require $secrets_file : [];
+    $mailCfg = isset($secrets['mail']) ? $secrets['mail'] : ['user' => '', 'pass' => '', 'from_name' => 'Amari Alabang'];
+
+    // No credentials configured → fail gracefully instead of erroring
+    if (empty($mailCfg['user']) || empty($mailCfg['pass'])) {
+        return false;
+    }
+
     $mail = new PHPMailer(true);
 
     try {
@@ -16,16 +26,16 @@ function sendAmariEmail($toEmail, $guestName, $subject, $htmlBody) {
         $mail->SMTPDebug  = 0; // debugger - change 0 to 2 if going to debug
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        
-        // YOUR AMARI CREDENTIALS (CORRECTED)
-        $mail->Username   = 'amaristaycation08@gmail.com'; 
-        $mail->Password   = 'nbbohghpmvtcoybr'; 
-        
+
+        // Credentials pulled from secrets.php
+        $mail->Username   = $mailCfg['user'];
+        $mail->Password   = $mailCfg['pass'];
+
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
         // --- Sender & Recipient ---
-        $mail->setFrom('amaristaycation08@gmail.com', 'Amari Alabang');
+        $mail->setFrom($mailCfg['user'], isset($mailCfg['from_name']) ? $mailCfg['from_name'] : 'Amari Alabang');
         $mail->addAddress($toEmail, $guestName);
 
         // --- Email Content ---

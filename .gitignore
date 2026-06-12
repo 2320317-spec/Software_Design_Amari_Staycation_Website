@@ -5,3 +5,6 @@ backups/
 Thumbs.db
 .DS_Store
 .vscode/
+
+# Real credentials — never commit (use secrets.example.php as the template)
+includes/secrets.php

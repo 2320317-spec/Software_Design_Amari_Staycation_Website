@@ -1,9 +1,20 @@
 <?php
-// Database Credentials - Back to Standard Defaults
-$servername = "localhost"; // Default port 3306
-$username = "root";        // Default XAMPP username
-$password = "";            // Default XAMPP password is empty
-$dbname = "amari_db";      // Your database name
+// Database Credentials — loaded from includes/secrets.php when present
+// (production / Hostinger), otherwise falls back to local XAMPP defaults.
+$secrets_file = __DIR__ . '/secrets.php';
+$secrets = file_exists($secrets_file) ? require $secrets_file : [];
+
+$db = isset($secrets['db']) ? $secrets['db'] : [
+    'host' => 'localhost', // Default XAMPP host
+    'user' => 'root',      // Default XAMPP username
+    'pass' => '',          // Default XAMPP password is empty
+    'name' => 'amari_db',  // Your database name
+];
+
+$servername = $db['host'];
+$username   = $db['user'];
+$password   = $db['pass'];
+$dbname     = $db['name'];
 
 // 1. Create the Connection
 $conn = new mysqli($servername, $username, $password, $dbname);
