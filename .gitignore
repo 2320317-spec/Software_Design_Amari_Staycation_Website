@@ -1,0 +1,7 @@
+# Local database restore points (not for the repo — use database/amari_db.sql instead)
+backups/
+
+# OS / editor clutter
+Thumbs.db
+.DS_Store
+.vscode/

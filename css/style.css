@@ -1,20 +1,25 @@
-/* 1. THE LUXURY PALETTE */
+/* 1. BRAND TOKENS — canonical palette, single source of truth */
 :root {
-    --mahogany: #502515;  /* Primary Identity */
-    --coffee: #564328;    /* Professional Text */
-    --gold: #c2a66e;      /* Buttons & Highlights */
-    --cream: #faf6f6;     /* Subtle Accents */
-    --white: #ffffff;
-    --shadow-tint: rgba(80, 37, 21, 0.1); /* Warm shadow */
+    --espresso:   #564328;  /* body text, primary identity */
+    --mahogany:   #502515;  /* headings, dark surfaces */
+    --gold:       #c2a66e;  /* accents, CTAs, highlights */
+    --soft-white: #faf6f6;  /* page bg, surfaces */
+    --white:      #ffffff;
+    --shadow-sm:  rgba(80,37,21,0.08);
+    --shadow-md:  rgba(80,37,21,0.14);
+    /* legacy aliases — kept for admin pages that still use old names */
+    --coffee:       var(--espresso);
+    --cream:        var(--soft-white);
+    --shadow-tint:  var(--shadow-sm);
 }
 
 /* 2. GENERAL STYLES */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
     line-height: 1.6;
-    color: var(--coffee);
+    color: var(--espresso);
     margin: 0;
-    background-color: var(--white); /* Mostly white for a clean vibe */
+    background-color: var(--white);
 }
 
 header {

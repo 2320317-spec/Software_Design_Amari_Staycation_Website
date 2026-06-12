@@ -217,6 +217,17 @@ if(isset($_GET['id'])) {
                             <label><i class="fa-regular fa-calendar-xmark" style="margin-right: 5px;"></i> Check-out</label>
                             <div><?php echo date("F j, Y", strtotime($invoice['check_out'])); ?></div>
                         </div>
+                        <?php if (isset($invoice['num_adults'])): ?>
+                        <div class="detail-box">
+                            <label><i class="fa-solid fa-users" style="margin-right: 5px;"></i> Guests</label>
+                            <div><?php
+                                $a = (int)$invoice['num_adults'];
+                                $c = (int)($invoice['num_children'] ?? 0);
+                                echo $a . ' Adult' . ($a > 1 ? 's' : '');
+                                if ($c > 0) echo ', ' . $c . ' Child' . ($c > 1 ? 'ren' : '');
+                            ?></div>
+                        </div>
+                        <?php endif; ?>
                     </div>
 
                     <?php if(!empty($invoice['special_requests'])): ?>

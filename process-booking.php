@@ -35,17 +35,22 @@ function showAmariMessage($title, $message, $link, $linkText) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // --- STEP 1: DATA CAPTURE ---
-    $unit_id = $_POST['unit_id'];
-    
+    $unit_id = intval($_POST['unit_id']);
+
     // Combine first and last name from the form into one variable safely
-    $guest_name = trim($_POST['first_name']) . " " . trim($_POST['last_name']); 
-    
+    $guest_name = trim($_POST['first_name']) . " " . trim($_POST['last_name']);
+
+    $guest_title = isset($_POST['guest_title']) ? trim($_POST['guest_title']) : '';
     $guest_email = $_POST['email'];
-    $check_in = $_POST['checkin']; 
-    $check_out = $_POST['checkout']; 
-    
+    $check_in = $_POST['checkin'];
+    $check_out = $_POST['checkout'];
+
     $phone = $_POST['phone'];
     $requests = $_POST['requests'];
+
+    // Guest counts from the wizard (default to sensible minimums)
+    $num_adults   = isset($_POST['num_adults'])   ? max(1, intval($_POST['num_adults']))   : 1;
+    $num_children = isset($_POST['num_children']) ? max(0, intval($_POST['num_children'])) : 0;
 
     // --- STEP 2: THE GUARDRAILS ---
     $check_in_time = strtotime($check_in);
@@ -79,10 +84,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         showAmariMessage("Dates Unavailable", "We're sorry, but another guest has already reserved this unit for those dates. Please try selecting different dates.", "javascript:history.back()", "Choose New Dates");
     } 
     else {
+        // --- STEP 3.5: PRICE (computed server-side, never trust the client) ---
+        $price_stmt = $conn->prepare("SELECT price_per_night FROM units WHERE id = ?");
+        $price_stmt->bind_param("i", $unit_id);
+        $price_stmt->execute();
+        $unit_row = $price_stmt->get_result()->fetch_assoc();
+        $price_stmt->close();
+        if (!$unit_row) {
+            showAmariMessage("System Error", "We could not find the selected suite. Please start your booking again.", "index.php", "Return Home");
+        }
+        $nights = max(1, (int)round(($check_out_time - $check_in_time) / 86400));
+        $total_price = $nights * (float)$unit_row['price_per_night'];
+
         // --- STEP 4: THE PACKER (Insert into DB) ---
-        $stmt = $conn->prepare("INSERT INTO bookings (unit_id, guest_name, guest_email, phone, special_requests, check_in, check_out, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')");
-        
-        $stmt->bind_param("issssss", $unit_id, $guest_name, $guest_email, $phone, $requests, $check_in, $check_out);
+        $stmt = $conn->prepare("INSERT INTO bookings (unit_id, guest_title, guest_name, guest_email, phone, num_adults, num_children, special_requests, check_in, check_out, total_price, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
+
+        $stmt->bind_param("issssiisssd", $unit_id, $guest_title, $guest_name, $guest_email, $phone, $num_adults, $num_children, $requests, $check_in, $check_out, $total_price);
 
         if ($stmt->execute()) {
             // Extract just the first name to make the success page feel personal

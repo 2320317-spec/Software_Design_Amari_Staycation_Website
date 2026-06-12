@@ -40,21 +40,60 @@ if (isset($_GET['id']) && isset($_GET['action'])) {
                 $in = date("F j, Y", strtotime($guest_data['check_in']));
                 $out = date("F j, Y", strtotime($guest_data['check_out']));
 
-                // Construct the Luxury HTML Email
-                $subject = "Reservation Confirmed: Amari Alabang";
-                $body = "
-                    <div style='font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 30px;'>
-                        <h2 style='color: #042e47; border-bottom: 2px solid #b0885a; padding-bottom: 10px;'>Amari Alabang</h2>
-                        <p>Dear <strong>$name</strong>,</p>
-                        <p>We are thrilled to confirm your reservation. We look forward to hosting you!</p>
-                        <div style='background: #f9f9f9; padding: 15px; margin: 20px 0; border-left: 4px solid #b0885a;'>
-                            <p style='margin: 5px 0;'><strong>Check-in:</strong> $in (3:00 PM)</p>
-                            <p style='margin: 5px 0;'><strong>Check-out:</strong> $out (12:00 PM)</p>
+                // Construct the Luxury HTML Email Invoice
+                $subject = "Your Amari Reservation is Confirmed";
+                
+                $body = '
+                <div style="font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4; padding: 40px 0; margin: 0; width: 100%;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        
+                        <div style="background-color: #042e47; padding: 50px 20px; text-align: center;">
+                            <h1 style="color: #b0885a; margin: 0; font-family: \'Playfair Display\', Georgia, serif; font-size: 38px; letter-spacing: 8px; text-transform: uppercase; font-weight: 400;">Amari</h1>
+                            
+                            <hr style="border: none; border-top: 1px solid #b0885a; width: 80px; margin: 10px auto;">
+                            
+                            <p style="color: #c4cdd2; margin: 0; font-family: \'Lato\', Arial, sans-serif; font-size: 10px; letter-spacing: 6px; text-transform: uppercase; font-weight: bold;">Alabang Staycation</p>
                         </div>
-                        <p>If you have any special requests prior to arrival, simply reply to this email.</p>
-                        <p>Warm regards,<br><strong>The Amari Team</strong></p>
+                        
+                        <div style="padding: 40px 40px 20px 40px; color: #333333;">
+                            <h2 style="font-family: Georgia, serif; font-size: 22px; color: #042e47; margin-top: 0;">Reservation Confirmed</h2>
+                            <p style="font-size: 15px; line-height: 1.6; color: #555;">Dear <strong>' . $name . '</strong>,</p>
+                            <p style="font-size: 15px; line-height: 1.6; color: #555;">Your reservation has been successfully processed. We are delighted to host you, and we have prepared your official itinerary below.</p>
+                            
+                            <div style="margin: 35px 0; border: 1px solid #eeeeee; border-radius: 8px; overflow: hidden;">
+                                <div style="background-color: #fafafa; padding: 15px 20px; border-bottom: 1px solid #eeeeee;">
+                                    <h3 style="margin: 0; font-size: 12px; color: #888888; text-transform: uppercase; letter-spacing: 2px;">Itinerary Details</h3>
+                                </div>
+                                <div style="padding: 25px 20px;">
+                                    <table style="width: 100%; font-size: 15px; line-height: 1.6; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding-bottom: 15px; color: #888; border-bottom: 1px solid #f0f0f0;">Check-in Date</td>
+                                            <td style="padding-bottom: 15px; font-weight: bold; text-align: right; color: #333; border-bottom: 1px solid #f0f0f0;">' . $in . ' <br><span style="font-size: 12px; color: #b0885a; font-weight: normal;">From 3:00 PM</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding-top: 15px; padding-bottom: 15px; color: #888; border-bottom: 1px solid #f0f0f0;">Check-out Date</td>
+                                            <td style="padding-top: 15px; padding-bottom: 15px; font-weight: bold; text-align: right; color: #333; border-bottom: 1px solid #f0f0f0;">' . $out . ' <br><span style="font-size: 12px; color: #b0885a; font-weight: normal;">By 12:00 PM</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding-top: 15px; color: #888;">Status</td>
+                                            <td style="padding-top: 15px; font-weight: bold; text-align: right; color: #27ae60;">CONFIRMED</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+            
+                            <p style="font-size: 14px; line-height: 1.6; color: #666; text-align: center; margin-top: 30px;">
+                                Prior to your arrival, our concierge will send you your digital door code and check-in guidelines. 
+                            </p>
+                        </div>
+                        
+                        <div style="background-color: #f9f9f9; padding: 25px; text-align: center; border-top: 1px solid #eeeeee;">
+                            <p style="margin: 0; font-size: 12px; color: #999; letter-spacing: 1px; text-transform: uppercase;">Amari Alabang Management</p>
+                            <p style="margin: 8px 0 0 0; font-size: 12px; color: #b0885a;">Need assistance? Reply directly to this email.</p>
+                        </div>
+                        
                     </div>
-                ";
+                </div>';
 
                 // Fire the email
                 sendAmariEmail($email, $name, $subject, $body);
